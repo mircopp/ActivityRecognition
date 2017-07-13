@@ -1,29 +1,45 @@
 import pickle as pc
 import numpy as np
 import pandas as ps
-
+import matplotlib.pyplot as plt
 from preprocessing import compress_data
 
+
 if __name__ == '__main__':
+
 
     sequence_length = 50
     model, sc = pc.load(open('model' + str(sequence_length) + '.bin', 'rb'))
 
-    use_datasets = np.linspace(1, 2, 1)
-    CSV_FILES = ['csv/mHealth_subject' + str(int(i)) + '.csv' for i in use_datasets]
+    use_datasets = np.linspace(1, 10, 10)
 
-    matrix = np.array([])
-    # Load data
-    for file in CSV_FILES:
-        data = ps.read_csv(file, sep=',').as_matrix()
-        data = compress_data.sequentialize_vectors(data, sequence_length=sequence_length)
-        matrix = np.vstack((matrix, data)) if matrix.any() else np.vstack(data)
+    for dataset in use_datasets:
 
-    for i in np.linspace(1, 12, 12):
-        filtered = np.array(list(filter(lambda x: x[-1]==i, matrix)))
-        filtered = sc.transform(filtered[:, :-1])
-        prediction = model.predict(filtered)
-        print(prediction)
+        CSV_FILES = ['csv/mHealth_subject' + str(int(dataset)) + '.csv']
 
+        matrix = np.array([])
+        # Load data
+        for file in CSV_FILES:
+            data = ps.read_csv(file, sep=',').as_matrix()
+            data = compress_data.sequentialize_vectors_non_labelled(data, sequence_length=sequence_length)
+            matrix = np.vstack((matrix, data)) if matrix.any() else np.vstack(data)
+
+        matrix = matrix[:, :-1]
+        matrix = sc.transform(matrix)
+
+        prediction = model.predict(matrix)
+        # plt.hist(prediction, bins=np.linspace(0.5,12.5,13))
+        # plt.show()
+
+        count = len(prediction)
+        weights = {}
+        for activity in np.unique(prediction):
+            weights[activity] = len(list(filter(lambda x: x == activity, prediction))) / count
+
+        total_score = 0
+        for key in weights:
+            score = compress_data.get_score(key)
+            total_score += score * weights[key]
+        print(total_score)
 
     pass
