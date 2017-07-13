@@ -2,6 +2,9 @@ import pandas as ps
 import numpy as np
 import pickle as pc
 
+from sklearn.base import BaseEstimator, TransformerMixin, ClassifierMixin
+
+
 from preprocessing import csv_transform
 from preprocessing import compress_data
 
@@ -10,7 +13,32 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 from sklearn.multiclass import OneVsRestClassifier
 
+class SequentialVitalModel(BaseEstimator, ClassifierMixin):
+
+    def __init__(self, sequence_length):
+        self.sequence_length = sequence_length
+
+    def fit(self, X, y):
+
+        """
+
+        :param X: Sequential sensory data
+        :param y: Class (output) of sensory data
+        :return: None
+        """
+
+        data_stack = X + y
+        clusters = np.array([[list(filter(lambda x: X[:, -1] == i, data_stack)) for i in np.unique(y)]])
+        matrix = np.array([])
+        for cluster in clusters:
+            matrix = np.vstack((matrix, compress_data.sequentialize_vectors(cluster, sequence_length=self.sequence_length))) if matrix.any() else np.vstack(cluster)
+
+        X, y = matrix[:, :-1], matrix[:, -1]
+
+
 def train_model(sequence_length, use_datasets=np.linspace(1, 10, 10)):
+
+    test = SequentialVitalModel(sequence_length=50)
     # Preparation variables
     RAW_FILES = ['data/mHealth_subject' + str(int(i)) + '.log' for i in use_datasets]
     CSV_FILES = ['csv/mHealth_subject' + str(int(i)) + '.csv' for i in use_datasets]
@@ -41,8 +69,8 @@ def train_model(sequence_length, use_datasets=np.linspace(1, 10, 10)):
     scores = []
 
     # # Train the model with different complexity parameters
-    for c in 10 ** np.linspace(-6, 6, 13):
-        for gamma in 10 ** np.linspace(-6, 2, 9):
+    for c in 10 ** np.linspace(-2, 3, 6):
+        for gamma in 10 ** np.linspace(-3, 2, 6):
             print('\tAnalysing C:\t', round(c, 6), '\t...\tGamma:\t', round(gamma, 6))
             model = OneVsRestClassifier(SVC(C=c, gamma=gamma), n_jobs=-1)
             model.fit(X_train, y_train)
@@ -65,8 +93,8 @@ def train_model(sequence_length, use_datasets=np.linspace(1, 10, 10)):
 
 if __name__ == '__main__':
     print('Run model training:\n')
-    size = 100
-    model, scaler = train_model(sequence_length=size, use_datasets=np.linspace(1, 10, 10))
+    size = 50
+    model, scaler = train_model(sequence_length=size, use_datasets=np.linspace(1, 9, 9))
 
     print('Save best model...\n')
     pc.dump((model, scaler), open('model' + str(size)  + '.bin', 'wb'))
