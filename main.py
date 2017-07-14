@@ -135,6 +135,9 @@ class SequentialSensoryDataModel(BaseEstimator, ClassifierMixin):
         self.best_performing_model, self.models = pc.load(open(path, 'rb'))
         return self
 
+    def get_models(self):
+        return self.models
+
 
 
 

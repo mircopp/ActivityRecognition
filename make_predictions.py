@@ -12,8 +12,9 @@ if __name__ == '__main__':
 
     sequence_length = 50
     model = SequentialSensoryDataModel(path='sequential_sensory_data_model.bin')
+    models = model.get_models()
 
-    use_datasets = np.linspace(1, 10, 10)
+    use_datasets = np.linspace(9, 11, 2)
 
     for dataset in use_datasets:
 
@@ -26,7 +27,13 @@ if __name__ == '__main__':
             data = compress_data.sequentialize_vectors_non_labelled(data, sequence_length=sequence_length)
             matrix = np.vstack((matrix, data)) if matrix.any() else np.vstack(data)
 
-        matrix = matrix[:, :-1]
+        X, y = matrix[:, :-1], matrix[:, -1]
+
+        for current in models:
+            print(current['description'], current['model'].score(X, y))
+
+
+        matrix = X
 
         prediction = model.predict(matrix)
         # plt.hist(prediction, bins=np.linspace(0.5,12.5,13))
