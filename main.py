@@ -43,44 +43,44 @@ class SequentialSensoryDataModel(BaseEstimator, ClassifierMixin):
         X_train, X_val, y_train, y_val = train_test_split(X, y, train_size=0.8, stratify=y)
 
         if not self.best_performing_model:
-            # Find the best model using brutforce
-
-            # Try KNN
-            pipe_knn = make_pipeline(
-                StandardScaler(),
-                KNeighborsClassifier()
-            )
-            knn_model = GridSearchCV(
-                estimator=pipe_knn,
-                param_grid=[{
-                    "kneighborsclassifier__n_neighbors": range(1, 101)
-                }],
-                verbose=2,
-                n_jobs=-1
-            )
-            self.models.append({
-                'model': knn_model,
-                'description': 'knn'
-            })
-
-            # Try boosting
-            pipe_boosting = make_pipeline(
-                StandardScaler(),
-                GradientBoostingClassifier()
-            )
-            boosting_model = GridSearchCV(
-                estimator=pipe_boosting,
-                param_grid=[{
-                    "gradientboostingclassifier__n_estimators": [2 ** i for i in range(0, 11)],
-                    "gradientboostingclassifier__learning_rate": [10 ** i for i in range(-5, 1)]
-                }],
-                verbose=2,
-                n_jobs=-1
-            )
-            self.models.append({
-                'model' : boosting_model,
-                'description' : 'boosting'
-            })
+            # # Find the best model using brutforce
+            #
+            # # Try KNN
+            # pipe_knn = make_pipeline(
+            #     StandardScaler(),
+            #     KNeighborsClassifier()
+            # )
+            # knn_model = GridSearchCV(
+            #     estimator=pipe_knn,
+            #     param_grid=[{
+            #         "kneighborsclassifier__n_neighbors": range(1, 101)
+            #     }],
+            #     verbose=2,
+            #     n_jobs=-1
+            # )
+            # self.models.append({
+            #     'model': knn_model,
+            #     'description': 'knn'
+            # })
+            #
+            # # Try boosting
+            # pipe_boosting = make_pipeline(
+            #     StandardScaler(),
+            #     GradientBoostingClassifier()
+            # )
+            # boosting_model = GridSearchCV(
+            #     estimator=pipe_boosting,
+            #     param_grid=[{
+            #         "gradientboostingclassifier__n_estimators": [2 ** i for i in range(0, 9)],
+            #         "gradientboostingclassifier__learning_rate": [10 ** i for i in range(-5, 1)]
+            #     }],
+            #     verbose=2,
+            #     n_jobs=-1
+            # )
+            # self.models.append({
+            #     'model' : boosting_model,
+            #     'description' : 'boosting'
+            # })
 
             # Try SVC
             pipe_svc = make_pipeline(
@@ -90,8 +90,8 @@ class SequentialSensoryDataModel(BaseEstimator, ClassifierMixin):
             svc_model = GridSearchCV(
                 estimator=pipe_svc,
                 param_grid=[{
-                    "svc__C": [10 ** i for i in range(-6, 7)],
-                    "svc__gamma": [10 ** i for i in range(-6, 3)]
+                    "svc__C": [10 ** i for i in range(-4, 6)],
+                    "svc__gamma": [10 ** i for i in range(-5, 3)]
                 }],
                 verbose=2,
                 n_jobs=-1
