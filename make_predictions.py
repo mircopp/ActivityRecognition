@@ -1,7 +1,6 @@
 import pickle as pc
 import numpy as np
 import pandas as ps
-import matplotlib.pyplot as plt
 from preprocessing import compress_data
 
 from main import SequentialSensoryDataModel
