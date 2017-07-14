@@ -186,7 +186,7 @@ def train_model(sequence_length=50, train_datasets=np.linspace(1, 8, 8), test_da
 if __name__ == '__main__':
     print('Run model training:\n')
     size = 50
-    model = train_model(sequence_length=size, train_datasets=np.linspace(1,2,1))
+    model = train_model(sequence_length=size)
 
     print('Save best model...\n')
     model.save_model()
