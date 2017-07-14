@@ -4,12 +4,14 @@ import pandas as ps
 import matplotlib.pyplot as plt
 from preprocessing import compress_data
 
+from main import SequentialSensoryDataModel
+
 
 if __name__ == '__main__':
 
 
     sequence_length = 50
-    model, sc = pc.load(open('model' + str(sequence_length) + '.bin', 'rb'))
+    model = SequentialSensoryDataModel(path='sequential_sensory_data_model.bin')
 
     use_datasets = np.linspace(1, 10, 10)
 
@@ -25,7 +27,6 @@ if __name__ == '__main__':
             matrix = np.vstack((matrix, data)) if matrix.any() else np.vstack(data)
 
         matrix = matrix[:, :-1]
-        matrix = sc.transform(matrix)
 
         prediction = model.predict(matrix)
         # plt.hist(prediction, bins=np.linspace(0.5,12.5,13))

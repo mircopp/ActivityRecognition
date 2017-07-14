@@ -1,5 +1,31 @@
 import numpy as np
-from sklearn.model_selection import train_test_split
+
+class DataProcessing():
+
+    def __init__(self, categorial_map, score_map, strategy='kubic'):
+        self.categorial_map = categorial_map
+        self.score_map = score_map
+        self.ranking_strategy = strategy
+
+    def fit(self, categories, scores):
+        categories = np.unique(categories)
+        self.categorial_map = None
+        for i in range(categories):
+            self.categorial_map[i] = categories[i]
+            self.score_map[i] = scores[i]
+        return self
+
+    def get_activitiy(self, activity_number):
+        return self.categorial_map[activity_number]
+
+    def get_score(self, activity_number):
+        if self.ranking_strategy == 'kubic':
+            return self.score_map[activity_number] ** 3
+        elif self.ranking_strategy == 'quadratic':
+            return self.score_map[activity_number] **2
+        #TODO add exponetial
+        else:
+            return self.score_map[activity_number]
 
 
 DICTIONARY = {
@@ -79,7 +105,6 @@ def sequentialize_vectors_non_labelled(data, sequence_length):
                 if len(tmp)<sequence_length:
                     missing_rows = sequence_length - len(tmp)
                     means = [np.mean(tmp, axis=0) for i in range(missing_rows)]
-                    # zeros = np.zeros((missing_rows, np.shape(tmp)[1]))
                     tmp = np.vstack((tmp, means))
                 tmp_res = []
                 for x in tmp[:, :-1]:
@@ -89,51 +114,17 @@ def sequentialize_vectors_non_labelled(data, sequence_length):
             clusters.extend(np.array(res))
     return np.array(clusters)
 
-def preprocess_data(data):
-    data = np.column_stack((
-        calculate_vector_length(data[:, :3]),
-        data[:, 3:5],
-        calculate_vector_length(data[:, 5:8]),
-        calculate_vector_length(data[:, 8:11]),
-        calculate_vector_length(data[:, 11:14]),
-        calculate_vector_length(data[:, 14:17]),
-        calculate_vector_length(data[:, 17:20]),
-        calculate_vector_length(data[:, 20:23]),
-        data[:, 23]
-    ))
-    clusters = []
-    for i in np.unique(data[:, -1]):
-        if not i == 0:
-            split_data = _split(data, data[:, -1] == i)[0]
-            mean_vals = np.mean(split_data, axis=0)
-            variances = np.var(split_data, axis=0)
-            standard_deviations = np.std(split_data, axis=0)
-            max_vals = np.max(split_data, axis=0)
-            min_vals = np.min(split_data, axis=0)
-            percentiles = []
-            for i in range(4):
-                percentiles = np.append(percentiles, np.percentile(split_data, (i+1)*25))
-            res = np.append(np.append(np.append(np.append(np.append(min_vals, max_vals), standard_deviations), variances), percentiles), mean_vals)
-            clusters.append(res)
-    return clusters
-
-def train_split(X, y, train_size=0.5):
-    X_train = []
-    y_train = []
-    X_test = []
-    y_test = []
-    matrix = np.column_stack((X,y))
-    for i in np.unique(y):
-        split_matrix = _split(matrix, matrix[:, -1] == i)[0]
-        X_split = split_matrix[:, :-1]
-        y_split = split_matrix[:, -1]
-        X_split_train, X_split_test, y_split_train, y_split_test = train_test_split(X_split, y_split, train_size=train_size)
-        X_train.extend(X_split_train)
-        X_test.extend(X_split_test)
-        y_train.extend(y_split_train)
-        y_test.extend(y_split_test)
-    return (np.array(X_train), np.array(X_test), np.array(y_train), np.array(y_test))
-
+def transform_tab_sep_to_csv(path, filename):
+    with open(path) as f:
+        content = f.readlines()
+    content = [x.strip() for x in content]
+    data = []
+    for x in content:
+        tmp = x.split(sep='\t')
+        data.append(tmp)
+    data = np.array(data)
+    X = data.astype(np.float64)
+    np.savetxt(filename, X, delimiter=",")
 
 
 
