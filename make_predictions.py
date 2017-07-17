@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as ps
 
-from seqmod.preprocessing import sequentialize_vectors_non_labelled, sequentialize_vectors
+from seqmod.preprocessing import Sequentializer
 from seqmod.model import SequentialSensoryDataModel
 from seqmod.metrics import ScoreMap
 
@@ -23,13 +23,10 @@ if __name__ == '__main__':
         CSV_FILES = ['csv/mHealth_subject' + str(int(dataset)) + '.csv']
 
         # Load data
-        matrix = np.array([])
-        for file in CSV_FILES:
-            data = ps.read_csv(file, sep=',').as_matrix()
-            data = sequentialize_vectors_non_labelled(data, sequence_length=SEQUENCE_LENGTH)
-            matrix = np.vstack((matrix, data)) if matrix.any() else np.vstack(data)
-
+        matrix = np.array(list(filter(lambda x: x[-1] == 0, Sequentializer(CSV_FILES).transform())))
         X, y = matrix[:, :-1], matrix[:, -1]
+
+        X = model.normalize(X)
 
         prediction = model.predict(X)
 

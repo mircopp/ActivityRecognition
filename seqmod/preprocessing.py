@@ -1,20 +1,41 @@
 import numpy as np
+import pandas as ps
 
-def _split(arr, cond):
-  return [arr[cond], arr[~cond]]
 
-def sequentialize_vectors(data, sequence_length):
-    clusters = []
-    for i in np.unique(data[:, -1]):
-        if not i == 0:
-            split_data = _split(data, data[:, -1] == i)[0]
+class Sequentializer():
+
+    def __init__(self, files, sequence_length=50):
+        self.filenames = files
+        self.sequence_length = sequence_length
+
+    def get_files(self):
+        return self.filenames
+
+    def get_sequence_length(self):
+        return self.sequence_length
+
+    def transform(self):
+        # Load the training data
+        data_stack = np.array([])
+        for file in self.filenames:
+            data = ps.read_csv(file, sep=',').as_matrix()
+            data = self._sequentialize_vectors(data)
+            data_stack = np.vstack((data_stack, data)) if data_stack.any() else np.vstack(data)
+        return data_stack
+
+    def _split(self, arr, cond):
+        return [arr[cond], arr[~cond]]
+
+    def _sequentialize_vectors(self, data):
+        clusters = []
+        for i in np.unique(data[:, -1]):
+            split_data = self._split(data, data[:, -1] == i)[0]
             res = []
-            for i in range(0, len(split_data), sequence_length):
-                tmp = split_data[i:(i+sequence_length)]
-                if len(tmp) < sequence_length:
-                    missing_rows = sequence_length - len(tmp)
+            for i in range(0, len(split_data),  self.sequence_length):
+                tmp = split_data[i:(i+ self.sequence_length)]
+                if len(tmp) <  self.sequence_length:
+                    missing_rows =  self.sequence_length - len(tmp)
                     means = [np.mean(tmp, axis=0) for i in range(missing_rows)]
-                    # zeros = np.zeros((missing_rows, np.shape(tmp)[1]))
                     tmp = np.vstack((tmp, means))
                 tmp_res = []
                 for x in tmp[:, :-1]:
@@ -22,25 +43,7 @@ def sequentialize_vectors(data, sequence_length):
                 tmp_res = np.append(tmp_res, tmp[0, -1])
                 res.extend([tmp_res])
             clusters.extend(np.array(res))
-    return np.array(clusters)
-
-def sequentialize_vectors_non_labelled(data, sequence_length):
-    clusters = []
-    split_data = _split(data, data[:, -1] == 0)[0]
-    res = []
-    for i in range(0, len(split_data), sequence_length):
-        tmp = split_data[i:(i+sequence_length)]
-        if len(tmp)<sequence_length:
-            missing_rows = sequence_length - len(tmp)
-            means = [np.mean(tmp, axis=0) for i in range(missing_rows)]
-            tmp = np.vstack((tmp, means))
-        tmp_res = []
-        for x in tmp[:, :-1]:
-            tmp_res.extend(x)
-        tmp_res = np.append(tmp_res, tmp[0, -1])
-        res.extend([tmp_res])
-    clusters.extend(np.array(res))
-    return np.array(clusters)
+        return np.array(clusters)
 
 def transform_to_csv(path, filename, sep='\t'):
     with open(path) as f:

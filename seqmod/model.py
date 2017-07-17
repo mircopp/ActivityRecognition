@@ -7,6 +7,9 @@ from sklearn.svm import SVC
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import make_pipeline
+from seqmod.training import _log, train_knn_model, train_boosting_model, train_svc_model
+
+from joblib import Parallel, delayed
 
 class SequentialSensoryDataModel(BaseEstimator, ClassifierMixin):
 
@@ -34,73 +37,45 @@ class SequentialSensoryDataModel(BaseEstimator, ClassifierMixin):
         :return: None
         """
 
-        X_train, X_val, y_train, y_val = train_test_split(X, y, train_size=0.9, stratify=y)
+        X_train, X_val, y_train, y_val = train_test_split(X, y, train_size=0.75, stratify=y)
+
+        # Normalization
+        self.standard_scaler = StandardScaler()
+        self.standard_scaler.fit(X_train)
+        X_train, X_val = self.standard_scaler.transform(X), self.standard_scaler.transform(X_val)
 
         if not self.best_performing_model:
-            # Find the best model using brutforce
 
+            # Find the best model using brutforce
             # Try KNN
-            pipe_knn = make_pipeline(
-                StandardScaler(),
-                KNeighborsClassifier()
-            )
-            knn_model = GridSearchCV(
-                estimator=pipe_knn,
-                param_grid=[{
-                    "kneighborsclassifier__n_neighbors": range(1, 81)
-                }],
-                cv=2,
-                verbose=10,
-                n_jobs=-1
-            )
+            knn_models = Parallel(n_jobs=-1)(delayed(train_knn_model)(X_train, X_val, y_train, y_val, n_neighbors) for n_neighbors in range(1, 81))
+            best = max(knn_models, key=lambda x: x['score'])
+            knn_model = best['model']
+            _log({'best_score': str(best['score'])}, '\n')
             self.models.append({
                 'model': knn_model,
                 'description': 'knn'
             })
 
             # Try boosting
-            pipe_boosting = make_pipeline(
-                StandardScaler(),
-                GradientBoostingClassifier()
-            )
-            boosting_model = GridSearchCV(
-                estimator=pipe_boosting,
-                param_grid=[{
-                    "gradientboostingclassifier__n_estimators": [2 ** i for i in range(0, 8)],
-                    "gradientboostingclassifier__learning_rate": [10 ** i for i in range(-5, 1)]
-                }],
-                cv=2,
-                verbose=10,
-                n_jobs=-1
-            )
+            boosting_models = Parallel(n_jobs=-1)(delayed(train_boosting_model)(X_train, X_val, y_train, y_val, n_estimators, learning_rate) for n_estimators in [2 ** i for i in range(0, 9)] for learning_rate in [10 ** i for i in range(-5, 2)])
+            best = max(boosting_models, key=lambda x: x['score'])
+            boosting_model = best['model']
+            _log({'best_score' : str(best['score'])}, '\n')
             self.models.append({
                 'model' : boosting_model,
                 'description' : 'boosting'
             })
 
             # Try SVC
-            pipe_svc = make_pipeline(
-                StandardScaler(),
-                SVC()
-            )
-            svc_model = GridSearchCV(
-                estimator=pipe_svc,
-                param_grid=[{
-                    "svc__C": [10 ** i for i in range(-2, 5)],
-                    "svc__gamma": [10 ** i for i in range(-4, 2)]
-                }],
-                cv=2,
-                verbose=10,
-                n_jobs=-1
-            )
+            svc_models = Parallel(n_jobs=-1)(delayed(train_svc_model)(X_train, X_val, y_train, y_val, C, gamma) for C in [10 ** i for i in range(-6, 6)] for gamma in [10 ** i for i in range(-6, 2)])
+            best = max(svc_models, key=lambda x: x['score'])
+            svc_model = best['model']
+            _log({'best_score' : str(best['score'])}, '\n')
             self.models.append({
                 'model': svc_model,
                 'description': 'svc'
             })
-
-
-            for model in self.models:
-                model['model'].fit(X_train, y_train)
 
             max_score = -1
             for model in self.models:
@@ -108,7 +83,6 @@ class SequentialSensoryDataModel(BaseEstimator, ClassifierMixin):
                 print(model['description'] + ':', score)
                 self.best_performing_model = model if score > max_score else self.best_performing_model
                 max_score = score if score > max_score else max_score
-
         else:
             self.best_performing_model['model'].fit(X_train, y_train)
             score = self.best_performing_model['model'].score(X_val, y_val)
@@ -134,7 +108,6 @@ class SequentialSensoryDataModel(BaseEstimator, ClassifierMixin):
         :param sample_weight: Sample weight
         :return: The accurracy of the model
         """
-
         return self.best_performing_model['model'].score(X, y)
 
     def save_model(self, path='sequential_sensory_data_model.bin'):
@@ -145,7 +118,7 @@ class SequentialSensoryDataModel(BaseEstimator, ClassifierMixin):
         :return: None
         """
 
-        pc.dump((self.best_performing_model, self.models), open(path, 'wb'))
+        pc.dump((self.best_performing_model, self.models, self.standard_scaler), open(path, 'wb'))
 
     def load_model(self, path='sequential_sensory_data_model.bin'):
         """
@@ -155,14 +128,33 @@ class SequentialSensoryDataModel(BaseEstimator, ClassifierMixin):
         :return: self
         """
 
-        self.best_performing_model, self.models = pc.load(open(path, 'rb'))
+        self.best_performing_model, self.models, self.standard_scaler = pc.load(open(path, 'rb'))
         return self
+
+    def normalize(self, X):
+        """
+        Normalizes the data accoriding to the fitting before
+        :param X: The input matrix
+        :return: Normalized matrix
+        """
+
+        return self.standard_scaler.transform(X)
 
     def get_models(self):
         """
         Get the other models beside the best model
-
         :return: The models
         """
 
         return self.models
+
+    def set_model(self, type):
+        """
+        Sets another model as best model
+        :param type: type of the new model in [knn, svc, boosting]
+        :return: None
+        """
+
+        for model in self.models:
+            if model['description'] == type:
+                self.best_performing_model = model
