@@ -42,7 +42,7 @@ class SequentialSensoryDataModel(BaseEstimator, ClassifierMixin):
         # Normalization
         self.standard_scaler = StandardScaler()
         self.standard_scaler.fit(X_train)
-        X_train, X_val = self.standard_scaler.transform(X), self.standard_scaler.transform(X_val)
+        X_train, X_val = self.standard_scaler.transform(X_train), self.standard_scaler.transform(X_val)
 
         if not self.best_performing_model:
 
