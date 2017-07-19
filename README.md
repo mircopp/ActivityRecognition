@@ -148,7 +148,7 @@ score_map = ScoreMap(DICTIONARY, SCOREMAP, strategy='exponential')
 .
 .
 
-# Compute weights (percentage of whole data) for the scores and plot results
+# Compute total score of the particular user (dataset)
 total_score = score_map.get_total_score(prediction)
 
 print(total_score)
