@@ -99,6 +99,9 @@ model.save_model(path=save_path)
 
 For making predictions with an precomputed model follow this example:
 ````python
+# Setup the model
+model = SequentialSensoryDataModel(path='sequential_sensory_data_model.bin')
+    
 file = 'data_collection/non_labelled/mHealth_non_labelled_subject1.csv'
 
 # Load data
@@ -115,6 +118,15 @@ prediction = model.predict(X)
 ### 2.3. Score the predictions
 For calculating wether the current user is acting quite active or not follow this example:
 ````python
+# Setup the score map
+DICTIONARY = ["None", "Standing", "Sitting", "Lying", "Walking", "Climbing stairs", "Waist bending", "Arm elevation", "Knees bending", "Cycling", "Jogging", "Running", "Jumping"]
+SCOREMAP = [0, 2, 1, 0, 3, 5, 4, 4, 4, 6, 4, 7, 5]
+score_map = ScoreMap(DICTIONARY, SCOREMAP, strategy='exponential')
+
+.
+.
+.
+
 # Compute weights (percentage of whole data) for the scores and plot results
 count = len(prediction)
 weights = {}
