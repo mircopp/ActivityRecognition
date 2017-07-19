@@ -25,7 +25,7 @@ Returns the score of the best performing model.
 For normalization it uses the **StandardScaler** of sklearn package. For applying nomralization with the model scaler the class provides a function to normalize the data before processing.    
 Returns the normalized matrix X.
 
-#### 1.1.5. sequentialize (X, y=np.array([]))
+#### 1.1.5. sequentialize (X, y=optional)
 With the sequentialize function the user can transform its input raw data (input matrix, output vectors) into a sequentialized vector matrix by using the models internal preprocessing object **Sequentializer** in order to have consistent sequence lengths. Custom sequence lengths could be passed during the model initialization (default 50).   
 Returns the sequentialized matrix x and vector y (if passed).
 
@@ -35,10 +35,10 @@ Returns all the models computed during the model selection.
 #### 1.1.7. set_model (type)
 Sets another of the computed models as best performing one if the user wants to do so (knn, boosting or svc).
 
-#### 1.1.8. save_model (path='sequential_sensory_data_model.bin')
+#### 1.1.8. save_model (path=optional)
 For further usage the user of this class can save the model and all its components (best performing model, other models, standard scaler, sequentializer).
 
-#### 1.1.9. load_model (path='sequential_sensory_data_model.bin')
+#### 1.1.9. load_model (path=optional)
 In order to load a precomputed model one can use this function by just giving the path of the model and all its components get loaded.
 
 ### 1.2. ScoreMap

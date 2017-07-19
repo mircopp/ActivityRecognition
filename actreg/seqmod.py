@@ -1,5 +1,6 @@
 import pickle as pc
 import numpy as np
+import os
 
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.model_selection import train_test_split
@@ -37,7 +38,7 @@ class SequentialSensoryDataModel(BaseEstimator, ClassifierMixin):
         :return: None
         """
 
-        X_train, X_val, y_train, y_val = train_test_split(X, y, train_size=0.66, stratify=y)
+        X_train, X_val, y_train, y_val = train_test_split(X, y, train_size=0.667, stratify=y)
 
         # Normalization
         self.standard_scaler = StandardScaler()
@@ -110,7 +111,7 @@ class SequentialSensoryDataModel(BaseEstimator, ClassifierMixin):
         """
         return self.best_performing_model['model'].score(X, y)
 
-    def save_model(self, path='sequential_sensory_data_model.bin'):
+    def save_model(self, path=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'binaries', 'sequential_sensory_data_model.bin')):
         """
         Saves the best performing model and the others used for the model selection
 
@@ -120,7 +121,7 @@ class SequentialSensoryDataModel(BaseEstimator, ClassifierMixin):
 
         pc.dump((self.best_performing_model, self.models, self.standard_scaler, self.sequentializer), open(path, 'wb'))
 
-    def load_model(self, path='sequential_sensory_data_model.bin'):
+    def load_model(self, path=os.path.join(os.path.dirname(os.path.realpath(__file__)), 'binaries', 'sequential_sensory_data_model.bin')):
         """
         Loads the model saved before
 

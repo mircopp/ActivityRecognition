@@ -15,7 +15,8 @@ if __name__ == '__main__':
     score_map = ScoreMap(DICTIONARY, SCOREMAP, strategy='exponential')
 
     # Setup the model
-    model = SequentialSensoryDataModel(path='sequential_sensory_data_model_classical.bin')
+    model = SequentialSensoryDataModel()
+    model.load_model()
 
     use_datasets = np.linspace(1, 10, 10)
     for dataset in use_datasets:
