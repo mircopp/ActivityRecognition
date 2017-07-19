@@ -1,9 +1,6 @@
-import numpy as np
 import pandas as ps
 
-from seqmod.preprocessing import Sequentializer
-from seqmod.model import SequentialSensoryDataModel
-from seqmod.metrics import ScoreMap
+from actreg.seqmod import SequentialSensoryDataModel
 
 if __name__ == '__main__':
     model_paths = ['sequential_sensory_data_model_fifth_iteration.bin']

@@ -1,7 +1,7 @@
 import pandas as ps
 import numpy as np
 
-from seqmod.model import SequentialSensoryDataModel
+from actreg.seqmod import SequentialSensoryDataModel
 
 def train_model(sequence_length=50, train_datasets=np.linspace(1, 9, 9), test_datasets=np.linspace(10, 10, 1), save_path='sequential_sensory_data_model.bin'):
 

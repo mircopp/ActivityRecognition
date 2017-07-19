@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as ps
 
-from seqmod.model import SequentialSensoryDataModel
-from seqmod.metrics import ScoreMap
+from actreg.seqmod import SequentialSensoryDataModel
+from actreg.metrics import ScoreMap
 
 import matplotlib.pyplot as plt
 

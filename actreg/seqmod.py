@@ -4,8 +4,8 @@ import numpy as np
 from sklearn.base import BaseEstimator, ClassifierMixin
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from seqmod.training import _log, train_knn_model, train_boosting_model, train_svc_model
-from seqmod.preprocessing import Sequentializer
+from actreg.training import _log, train_knn_model, train_boosting_model, train_svc_model
+from actreg.preprocessing import Sequentializer
 
 from joblib import Parallel, delayed
 
@@ -25,7 +25,7 @@ class SequentialSensoryDataModel(BaseEstimator, ClassifierMixin):
             self.best_performing_model = None
             self.models = []
             self.standard_scaler = None
-            self.sequentializer = Sequentializer(sequence_length=50)
+            self.sequentializer = Sequentializer(sequence_length=sequence_length)
 
     def fit(self, X, y):
 
