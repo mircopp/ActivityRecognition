@@ -7,7 +7,7 @@
 You get in touch with its main modules and functionalities.
 
 ### 1.1 SequentialSensoryDataModel
-> The model called **SequentialSensoryDataModel** is designed for processing sensory data that was measured in a sequential setting (time dependand), classified by e.g. the activity of the user.   
+> The model called **SequentialSensoryDataModel** is designed for processing sensory data that was measured in a sequential setting (time-dependent), classified by e.g. the activity of the user.   
 In this use case the class was used in order to recognize certain user activity based on sequentially measured vital signs.
 
 #### 1.1.1. fit (X, y)
@@ -43,8 +43,8 @@ In order to load a precomputed model one can use this function by just giving th
 
 ### 1.2. ScoreMap
 
-> For having a mechanism to classify the actions of a user and them give a certain score the class called **ScoreMap** was introduced.   
-It needs a vector of categories and the ordinal scale depending on the cetagories as features as well as a scoring strategy (linear, quadratic, kubic, exponential) for initialization.
+> For having a mechanism to classify the actions of a user and giving them a certain score the class called **ScoreMap** was introduced.   
+It needs a vector of categories and the ordinal scale depending on the categories as features as well as a scoring strategy (linear, quadratic, kubic, exponential) for initialization.
 
 #### 1.2.1. fit (categories, scores)
 Fits categories to scores and enumerates them.
