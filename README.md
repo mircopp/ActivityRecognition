@@ -1,63 +1,63 @@
 
-#Activity Recognition
+# Activity Recognition
 
 ## 1. Documentation
 
->This section is about the most important parts of the developed package called **actreg** and all the features given by the API.
->You get in touch with its main modules and functionalities.
+> This section is about the most important parts of the developed package called **actreg** and all the features given by the API.  
+You get in touch with its main modules and functionalities.
 
-###1.1 SequentialSensoryDataModel
->The model called **SequentialSensoryDataModel** is designed for processing sensory data that was measured in a sequential setting (time dependand), classified by e.g. the activity of the user.   
+### 1.1 SequentialSensoryDataModel
+> The model called **SequentialSensoryDataModel** is designed for processing sensory data that was measured in a sequential setting (time dependand), classified by e.g. the activity of the user.   
 In this use case the class was used in orde3r to recognize certain user activity based on sequentially measured vital signs.
 
-####1.1.1. fit
+#### 1.1.1. fit
 At the beginning the model splits the input matrix and output vector in training and validation parts in order to compare the accurracies of different models. It tests the 
  predictive power of the well-known models (KNeighborsClassifier, GradientBoostingClassifier and SVC) during the fitting process. and sets the best performing one for further computations.  
  It runs all computations in parallel with usage of the **joblib** package in order to finish the fitting as fast as possible.
   
-####1.1.2. predict
+#### 1.1.2. predict
 Prediction of the best performing model.
 
-####1.1.3. score
+#### 1.1.3. score
 Score of the best performing model
 
-####1.1.4. normalize
+#### 1.1.4. normalize
 For normalization it uses the **StandardScaler** of sklearn package. For applying nomralization with the model scaler the class provides a function to normalize the data before processing.
 
-####1.1.5. sequentialize
+#### 1.1.5. sequentialize
 With the sequentialize function the user can transform its input raw data (input matrix, output vectors) into a sequentialized vector matrix by using the models internal preprocessing object **Sequentializer** in order to have consistent sequence lengths. Custom sequence lengths could be passed during the model initialization (default 50).
 
-####1.1.6. get_models
+#### 1.1.6. get_models
 Returns all the models computed during the model selection.
 
-####1.1.7. set_model
+#### 1.1.7. set_model
 Sets another of the computed models as best performing one if the user wants to do so (knn, boosting or svc)
 
-####1.1.8. save_model
+#### 1.1.8. save_model
 For further usage the user of this class can save the model and all its components (best performing model, other models, standard scaler, sequentializer)
 
-####1.1.9. load_model
+#### 1.1.9. load_model
 In order to load a precomputed model one can use this function by just giving the path of the model and all its components get loaded.
 
-###1.2. ScoreMap
+### 1.2. ScoreMap
 
->For having a mechanism to classify the actions of a user and them give a certain score the class called **ScoreMap** was introduced.   
+> For having a mechanism to classify the actions of a user and them give a certain score the class called **ScoreMap** was introduced.   
 It needs a vector of categories and the ordinal scale depending on the cetagories as features as well as a scoring strategy (linear, quadratic, kubic, exponential) for initialization.
 
-####1.2.1. fit
+#### 1.2.1. fit
 Fits categories to scores and enumerates them.
 
-####1.2.2. get_activitiy
+#### 1.2.2. get_activitiy
 Returns the description of an activity as string for a certain number.
 
-####1.2.3 get_score
+#### 1.2.3 get_score
 Depending on the scoring strategy this function returns the score for a certain number (defined by enumeration of the categories)
 
-##2. Usage
+## 2. Usage
 
 > In this sector one can find some example of how to use the model and score map.
 
-###2.1. Model training
+### 2.1. Model training
 At first import all needed dependencies:
 ```python
 import pandas as ps
@@ -95,7 +95,7 @@ print('Save best model...\n')
 model.save_model(path=save_path)
 ````
 
-###2.2. Model prediction
+### 2.2. Model prediction
 
 For making predictions with an precomputed model follow this example:
 ````python
@@ -112,7 +112,7 @@ X = model.normalize(X)
 prediction = model.predict(X)
 ````
 
-###2.3. Score the predictions
+### 2.3. Score the predictions
 For calculating wether the current user is acting quite active or not follow this example:
 ````python
 # Compute weights (percentage of whole data) for the scores and plot results
