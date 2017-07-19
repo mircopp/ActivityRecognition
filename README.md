@@ -11,9 +11,9 @@ You get in touch with its main modules and functionalities.
 In this use case the class was used in order to recognize certain user activity based on sequentially measured vital signs.
 
 #### 1.1.1. fit (X, y)
-At the beginning the model splits the input matrix and output vector in training and validation parts in order to compare the accurracies of different models. It tests the 
+At the beginning the model splits the input matrix and output vector in training and validation parts in order to compare the accuracies of different models. It tests the 
  predictive power of the well-known models (KNeighborsClassifier, GradientBoostingClassifier and SVC) during the fitting process. and sets the best performing one for further computations.  
- It runs all computations in parallel with usage of the **joblib** package in order to finish the fitting as fast as possible.
+ It runs all computations in parallel using the **joblib** package in order to finish the fitting as fast as possible.
   
 #### 1.1.2. predict (X)
 Returns the prediction of the best performing model.
@@ -36,25 +36,25 @@ Returns all the models computed during the model selection.
 Sets another of the computed models as best performing one if the user wants to do so (knn, boosting or svc).
 
 #### 1.1.8. save_model (path=optional)
-For further usage the user of this class can save the model and all its components (best performing model, other models, standard scaler, sequentializer).
+For further usage, the user of this class can save the model and all its components (best performing model, other models, standard scaler, sequentializer).
 
 #### 1.1.9. load_model (path=optional)
-In order to load a precomputed model one can use this function by just giving the path of the model and all its components get loaded.
+In order to load a precomputed model, one can use this function by just giving the path of the model and all its components get loaded.
 
 ### 1.2. ScoreMap
 
-> For having a mechanism to classify the actions of a user and giving them a certain score the class called **ScoreMap** was introduced.   
+> For having a mechanism to classify the activities of a user and giving them a certain score the class called **ScoreMap** was introduced.   
 It needs a vector of categories and the ordinal scale depending on the categories as features as well as a scoring strategy (linear, quadratic, kubic, exponential) for initialization.
 
 #### 1.2.1. fit (categories, scores)
 Fits categories to scores and enumerates them.
 
 #### 1.2.2. get_total_score (activity_numbers)
-Computes the particular weights as amount of whole datasize for each activity. 
+Computes the particular weights as amount of the whole datasize for each activity. 
 Returns the total summed and weighted activity score.
  
 #### 1.2.3. get_weights ():
-Returns the weights computed during las total score calculation with corresponding activities as a map with activities pointing to weights.
+Returns the weights computed during last total score calculation with corresponding activities as a map with activities pointing to weights.
 
 #### 1.2.2. get_activitiy (activity_number)
 Returns the description of an activity as string for a certain number.
