@@ -16,16 +16,18 @@ At the beginning the model splits the input matrix and output vector in training
  It runs all computations in parallel with usage of the **joblib** package in order to finish the fitting as fast as possible.
   
 #### 1.1.2. predict (X)
-Prediction of the best performing model.
+Returns the prediction of the best performing model.
 
 #### 1.1.3. score (X, y)
-Score of the best performing model
+Returns the score of the best performing model
 
 #### 1.1.4. normalize (X)
-For normalization it uses the **StandardScaler** of sklearn package. For applying nomralization with the model scaler the class provides a function to normalize the data before processing.
+For normalization it uses the **StandardScaler** of sklearn package. For applying nomralization with the model scaler the class provides a function to normalize the data before processing.    
+Returns the normalized matrix X.
 
 #### 1.1.5. sequentialize (X, y=np.array([]))
-With the sequentialize function the user can transform its input raw data (input matrix, output vectors) into a sequentialized vector matrix by using the models internal preprocessing object **Sequentializer** in order to have consistent sequence lengths. Custom sequence lengths could be passed during the model initialization (default 50).
+With the sequentialize function the user can transform its input raw data (input matrix, output vectors) into a sequentialized vector matrix by using the models internal preprocessing object **Sequentializer** in order to have consistent sequence lengths. Custom sequence lengths could be passed during the model initialization (default 50).   
+Returns the sequentialized matrix x and vector y (if passed).
 
 #### 1.1.6. get_models ()
 Returns all the models computed during the model selection.
