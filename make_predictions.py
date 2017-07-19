@@ -33,26 +33,22 @@ if __name__ == '__main__':
         prediction = model.predict(X)
 
         # Compute weights (percentage of whole data) for the scores and plot results
-        count = len(prediction)
-        weights = {}
+        total_score = score_map.get_total_score(prediction)
+        weights = score_map.get_weights()
         labels = []
         sizes = []
         for activity in np.unique(prediction):
-            weights[activity] = len(list(filter(lambda x: x == activity, prediction))) / count
             if weights[activity]*100 > 2:
                 labels.append(score_map.get_activitiy(activity))
                 sizes.append(int(weights[activity]*100))
+
         # Pie chart, where the slices will be ordered and plotted counter-clockwise:
         fig1, ax1 = plt.subplots()
         ax1.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
         ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
 
-        total_score = 0
-        for key in weights:
-            score = score_map.get_score(key)
-            total_score += score * weights[key]
-        print(total_score)
-
         plt.savefig('./plots/pies/subject' + str(int(dataset)) + '_score' + str(int(total_score)) + '.png')
         plt.cla()
         plt.clf()
+
+        print(total_score)

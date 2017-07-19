@@ -8,7 +8,7 @@ You get in touch with its main modules and functionalities.
 
 ### 1.1 SequentialSensoryDataModel
 > The model called **SequentialSensoryDataModel** is designed for processing sensory data that was measured in a sequential setting (time dependand), classified by e.g. the activity of the user.   
-In this use case the class was used in orde3r to recognize certain user activity based on sequentially measured vital signs.
+In this use case the class was used in order to recognize certain user activity based on sequentially measured vital signs.
 
 #### 1.1.1. fit (X, y)
 At the beginning the model splits the input matrix and output vector in training and validation parts in order to compare the accurracies of different models. It tests the 
@@ -22,7 +22,7 @@ Returns the prediction of the best performing model.
 Returns the score of the best performing model.
 
 #### 1.1.4. normalize (X)
-For normalization it uses the **StandardScaler** of sklearn package. For applying nomralization with the model scaler the class provides a function to normalize the data before processing.    
+For normalization it uses the **StandardScaler** of sklearn package. For applying normalization with the model's internal standard scaler the class provides a function to normalize the data before processing.    
 Returns the normalized matrix X.
 
 #### 1.1.5. sequentialize (X, y=optional)
@@ -48,6 +48,13 @@ It needs a vector of categories and the ordinal scale depending on the cetagorie
 
 #### 1.2.1. fit (categories, scores)
 Fits categories to scores and enumerates them.
+
+#### 1.2.2. get_total_score (activity_numbers)
+Computes the particular weights as amount of whole datasize for each activity. 
+Returns the total summed and weighted activity score.
+ 
+#### 1.2.3. get_weights ():
+Returns the weights computed during las total score calculation with corresponding activities as a map with activities pointing to weights.
 
 #### 1.2.2. get_activitiy (activity_number)
 Returns the description of an activity as string for a certain number.
@@ -142,16 +149,7 @@ score_map = ScoreMap(DICTIONARY, SCOREMAP, strategy='exponential')
 .
 
 # Compute weights (percentage of whole data) for the scores and plot results
-count = len(prediction)
-weights = {}
+total_score = score_map.get_total_score(prediction)
 
-for activity in np.unique(prediction):
-    weights[activity] = len(list(filter(lambda x: x == activity, prediction))) / count
-    
-# Calculate the total score
-total_score = 0
-for key in weights:
-    score = score_map.get_score(key)
-    total_score += score * weights[key]
 print(total_score)
 ````

@@ -13,6 +13,7 @@ class ScoreMap():
         """
 
         self.fit(categories, scores)
+        self.weights = {}
         self.ranking_strategy = strategy
         self.factor = factor
         self.bias = bias
@@ -31,6 +32,31 @@ class ScoreMap():
             self.categorial_map[i] = categories[i]
             self.score_map[i] = scores[i]
         return self
+
+    def get_total_score(self, activity_numbers):
+        """
+        Computes the particular weights for each activity and returns the total weighted activity score
+        :param activity_numbers: A list of overall activities during a certain timespan
+        :return: The total score (summed weighted amounts of particular activities multiplicated with particular score)
+        """
+
+        self.weights = {}
+        count = len(activity_numbers)
+        for activity in np.unique(activity_numbers):
+            self.weights[activity] = len(list(filter(lambda x: x == activity, activity_numbers))) / count
+        total_score = 0
+        for key in self.weights:
+            score = self.get_score(key)
+            total_score += score * self.weights[key]
+        return total_score
+
+    def get_weights(self):
+        """
+        Get the last computed weights with corresponding activities as a map
+        :return: The map of activities pointing to weights (total amount of input list)
+        """
+
+        return self.weights
 
     def get_activitiy(self, activity_number):
         """
