@@ -1,46 +1,40 @@
 import pandas as ps
 import numpy as np
 
-from seqmod.preprocessing import transform_to_csv, Sequentializer
 from seqmod.model import SequentialSensoryDataModel
 
 def train_model(sequence_length=50, train_datasets=np.linspace(1, 9, 9), test_datasets=np.linspace(10, 10, 1), save_path='sequential_sensory_data_model.bin'):
 
     print('Run model training:\n')
-    model = SequentialSensoryDataModel()
+    model = SequentialSensoryDataModel(sequence_length=sequence_length)
 
-    PREPARED = True
-
-    # Files
-    RAW_FILES_TRAINING = ['data/mHealth_subject' + str(int(i)) + '.log' for i in train_datasets]
-    RAW_FILES_TEST = ['data/mHealth_subject' + str(int(i)) + '.log' for i in test_datasets]
-
-    CSV_FILES_TRAINING = ['csv/mHealth_subject' + str(int(i)) + '.csv' for i in train_datasets]
-    CSV_FILES_TEST = ['csv/mHealth_subject' + str(int(i)) + '.csv' for i in test_datasets]
-
-    if not PREPARED:
-        for i in range(len(RAW_FILES_TRAINING)):
-            transform_to_csv(RAW_FILES_TRAINING[i], CSV_FILES_TRAINING[i], sep='\t')
-        for i in range(len(RAW_FILES_TEST)):
-            transform_to_csv(RAW_FILES_TEST[i], CSV_FILES_TEST[i], sep='\t')
+    TRAINING_FILES = ['data_collection/labelled/mHealth_subject' + str(int(i)) + '.csv' for i in train_datasets]
+    TEST_FILES = ['data_collection/labelled/mHealth_subject' + str(int(i)) + '.csv' for i in test_datasets]
 
     # Load the training data
-    training_data = np.array(list(filter(lambda x: x[-1] != 0, Sequentializer(CSV_FILES_TRAINING).transform())))
+    X_train, y_train = np.array([]), np.array([])
+    for file in TRAINING_FILES:
+        XY_train = ps.read_csv(file, sep=',').as_matrix()
+        X_tmp_train, y_tmp_train = model.sequentialize(XY_train[:, :-1], XY_train[:, -1])
+        X_train = np.append(X_train, X_tmp_train, axis=0) if X_train.any() else X_tmp_train
+        y_train = np.append(y_train, y_tmp_train) if y_train.any() else y_tmp_train
 
     # Load the test data
-    test_data = np.array(list(filter(lambda x: x[-1] != 0, Sequentializer(CSV_FILES_TEST).transform())))
-
-    X_train, y_train = training_data[:, :-1], training_data[:, -1]
-    X_test, y_test = test_data[:, :-1], test_data[:, -1]
+    X_test, y_test = np.array([]), np.array([])
+    for file in TEST_FILES:
+        XY_test = ps.read_csv(file, sep=',').as_matrix()
+        X_tmp_test, y_tmp_test = model.sequentialize(XY_test[:, :-1], XY_test[:, -1])
+        X_test = np.append(X_test, X_tmp_test, axis=0) if X_test.any() else X_tmp_test
+        y_test = np.append(y_test, y_tmp_test) if y_test.any() else y_tmp_test
 
     # Fit the model to the training dataset
     model.fit(X_train, y_train)
 
-
-    # # Test the model with best parameter and normalized test data
+    # Test the model with best parameter and normalized test data
     X_test = model.normalize(X_test)
     print('\nTest score:', model.score(X_test, y_test))
 
+    # Safe the model and all his components
     print('Save best model...\n')
     model.save_model(path=save_path)
 
@@ -48,6 +42,6 @@ def train_model(sequence_length=50, train_datasets=np.linspace(1, 9, 9), test_da
 
     return model
 
-
-
-
+if __name__ == '__main__':
+    size = 50
+    train_model(sequence_length=size)

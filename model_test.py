@@ -6,19 +6,18 @@ from seqmod.model import SequentialSensoryDataModel
 from seqmod.metrics import ScoreMap
 
 if __name__ == '__main__':
-    model_paths = ['sequential_sensory_data_model.bin']
+    model_paths = ['sequential_sensory_data_model_fifth_iteration.bin']
     for path in model_paths:
         model = SequentialSensoryDataModel(path=path)
         models = model.get_models()
 
         dataset = 10
 
-        CSV_FILES = ['csv/mHealth_subject' + str(int(dataset)) + '.csv']
+        file = 'data_collection/labelled/mHealth_subject' + str(int(dataset)) + '.csv'
 
         # Load data
-        matrix = np.array(list(filter(lambda x: x[-1] != 0, Sequentializer(CSV_FILES).transform())))
-
-        X, y = matrix[:, :-1], matrix[:, -1]
+        XY = ps.read_csv(file, sep=',').as_matrix()
+        X, y = model.sequentialize(XY[:, :-1], XY[:, -1])
 
         X = model.normalize(X)
 

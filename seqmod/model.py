@@ -1,19 +1,17 @@
 import pickle as pc
+import numpy as np
 
 from sklearn.base import BaseEstimator, ClassifierMixin
-from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.svm import SVC
-from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.pipeline import make_pipeline
 from seqmod.training import _log, train_knn_model, train_boosting_model, train_svc_model
+from seqmod.preprocessing import Sequentializer
 
 from joblib import Parallel, delayed
 
 class SequentialSensoryDataModel(BaseEstimator, ClassifierMixin):
 
-    def __init__(self, path=None):
+    def __init__(self, path=None, sequence_length=50):
         """
         Initializes the sequential sensory data model
 
@@ -21,11 +19,13 @@ class SequentialSensoryDataModel(BaseEstimator, ClassifierMixin):
         :param model_description: What is the model about
         """
 
-        self.models = []
         if path:
             self.load_model(path)
         else:
             self.best_performing_model = None
+            self.models = []
+            self.standard_scaler = None
+            self.sequentializer = Sequentializer(sequence_length=50)
 
     def fit(self, X, y):
 
@@ -118,7 +118,7 @@ class SequentialSensoryDataModel(BaseEstimator, ClassifierMixin):
         :return: None
         """
 
-        pc.dump((self.best_performing_model, self.models, self.standard_scaler), open(path, 'wb'))
+        pc.dump((self.best_performing_model, self.models, self.standard_scaler, self.sequentializer), open(path, 'wb'))
 
     def load_model(self, path='sequential_sensory_data_model.bin'):
         """
@@ -128,7 +128,7 @@ class SequentialSensoryDataModel(BaseEstimator, ClassifierMixin):
         :return: self
         """
 
-        self.best_performing_model, self.models, self.standard_scaler = pc.load(open(path, 'rb'))
+        self.best_performing_model, self.models, self.standard_scaler, self.sequentializer = pc.load(open(path, 'rb'))
         return self
 
     def normalize(self, X):
@@ -139,6 +139,9 @@ class SequentialSensoryDataModel(BaseEstimator, ClassifierMixin):
         """
 
         return self.standard_scaler.transform(X)
+
+    def sequentialize(self, X, y=np.array([])):
+        return self.sequentializer.transform(X, y)
 
     def get_models(self):
         """

@@ -4,55 +4,49 @@ import pandas as ps
 
 class Sequentializer():
 
-    def __init__(self, files, sequence_length=50):
-        self.filenames = files
+    def __init__(self, sequence_length=50):
         self.sequence_length = sequence_length
-
-    def get_files(self):
-        return self.filenames
 
     def get_sequence_length(self):
         return self.sequence_length
 
-    def transform(self):
-        # Load the training data
-        data_stack = np.array([])
-        for file in self.filenames:
-            data = ps.read_csv(file, sep=',').as_matrix()
-            data = self._sequentialize_vectors(data)
-            data_stack = np.vstack((data_stack, data)) if data_stack.any() else np.vstack(data)
-        return data_stack
+    def transform(self, X, y):
+        if y.any():
+            XY = self._sequentialize_vectors(np.column_stack((X, y)))
+            return XY[:, :-1], XY[:, -1]
+        else:
+            return self._sequentialize_vectors_non_labelled(X)
 
     def _split(self, arr, cond):
         return [arr[cond], arr[~cond]]
 
-    def _sequentialize_vectors(self, data):
-        clusters = []
-        for i in np.unique(data[:, -1]):
-            split_data = self._split(data, data[:, -1] == i)[0]
-            res = []
-            for i in range(0, len(split_data),  self.sequence_length):
-                tmp = split_data[i:(i+ self.sequence_length)]
-                if len(tmp) <  self.sequence_length:
-                    missing_rows =  self.sequence_length - len(tmp)
-                    means = [np.mean(tmp, axis=0) for i in range(missing_rows)]
-                    tmp = np.vstack((tmp, means))
-                tmp_res = []
-                for x in tmp[:, :-1]:
-                    tmp_res.extend(x)
-                tmp_res = np.append(tmp_res, tmp[0, -1])
-                res.extend([tmp_res])
-            clusters.extend(np.array(res))
-        return np.array(clusters)
+    def _sequentialize_vectors(self, XY):
+        XY_sequentialized = []
+        for i in np.unique(XY[:, -1]):
+            XY_split = self._split(XY, XY[:, -1] == i)[0]
+            for i in range(0, len(XY_split),  self.sequence_length):
+                XY_curr_sequence = XY_split[i:(i+ self.sequence_length)]
+                if len(XY_curr_sequence) <  self.sequence_length:
+                    missing_rows =  self.sequence_length - len(XY_curr_sequence)
+                    means = [np.mean(XY_curr_sequence, axis=0) for i in range(missing_rows)]
+                    XY_curr_sequence = np.append(XY_curr_sequence, means, axis=0)
+                y_sequentialized = []
+                for x in XY_curr_sequence[:, :-1]:
+                    y_sequentialized.extend(x)
+                y_sequentialized = np.append(y_sequentialized, XY_curr_sequence[0, -1])
+                XY_sequentialized.append(y_sequentialized)
+        return np.array(XY_sequentialized)
 
-def transform_to_csv(path, filename, sep='\t'):
-    with open(path) as f:
-        content = f.readlines()
-    content = [x.strip() for x in content]
-    data = []
-    for x in content:
-        tmp = x.split(sep=sep)
-        data.append(tmp)
-    data = np.array(data)
-    X = data.astype(np.float64)
-    np.savetxt(filename, X, delimiter=",")
+    def _sequentialize_vectors_non_labelled(self, XY):
+        XY_sequentialized = []
+        for i in range(0, len(XY), self.sequence_length):
+            XY_curr_sequence = XY[i:(i + self.sequence_length)]
+            if len(XY_curr_sequence) <  self.sequence_length:
+                missing_rows =  self.sequence_length - len(XY_curr_sequence)
+                means = [np.mean(XY_curr_sequence, axis=0) for i in range(missing_rows)]
+                XY_curr_sequence = np.vstack((XY_curr_sequence, means))
+            y_sequentialized = []
+            for x in XY_curr_sequence[:, :-1]:
+                y_sequentialized.extend(x)
+            XY_sequentialized.append(y_sequentialized)
+        return np.array(XY_sequentialized)
