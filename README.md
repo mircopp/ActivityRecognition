@@ -123,6 +123,7 @@ DICTIONARY = ["None", "Standing", "Sitting", "Lying", "Walking", "Climbing stair
 SCOREMAP = [0, 2, 1, 0, 3, 5, 4, 4, 4, 6, 4, 7, 5]
 score_map = ScoreMap(DICTIONARY, SCOREMAP, strategy='exponential')
 
+# Code on making predictions on loaded data
 .
 .
 .
