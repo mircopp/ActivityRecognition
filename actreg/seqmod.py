@@ -107,7 +107,7 @@ class SequentialSensoryDataModel(BaseEstimator, ClassifierMixin):
         :param X: Input matrix of features
         :param y: Real values
         :param sample_weight: Sample weight
-        :return: The accurracy of the model
+        :return: The accuracy of the model
         """
         return self.best_performing_model['model'].score(X, y)
 
