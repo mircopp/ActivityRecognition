@@ -10,33 +10,33 @@ You get in touch with its main modules and functionalities.
 > The model called **SequentialSensoryDataModel** is designed for processing sensory data that was measured in a sequential setting (time dependand), classified by e.g. the activity of the user.   
 In this use case the class was used in orde3r to recognize certain user activity based on sequentially measured vital signs.
 
-#### 1.1.1. fit
+#### 1.1.1. fit (X, y)
 At the beginning the model splits the input matrix and output vector in training and validation parts in order to compare the accurracies of different models. It tests the 
  predictive power of the well-known models (KNeighborsClassifier, GradientBoostingClassifier and SVC) during the fitting process. and sets the best performing one for further computations.  
  It runs all computations in parallel with usage of the **joblib** package in order to finish the fitting as fast as possible.
   
-#### 1.1.2. predict
+#### 1.1.2. predict (X)
 Prediction of the best performing model.
 
-#### 1.1.3. score
+#### 1.1.3. score (X, y)
 Score of the best performing model
 
-#### 1.1.4. normalize
+#### 1.1.4. normalize (X)
 For normalization it uses the **StandardScaler** of sklearn package. For applying nomralization with the model scaler the class provides a function to normalize the data before processing.
 
-#### 1.1.5. sequentialize
+#### 1.1.5. sequentialize (X, y=np.array([]))
 With the sequentialize function the user can transform its input raw data (input matrix, output vectors) into a sequentialized vector matrix by using the models internal preprocessing object **Sequentializer** in order to have consistent sequence lengths. Custom sequence lengths could be passed during the model initialization (default 50).
 
-#### 1.1.6. get_models
+#### 1.1.6. get_models ()
 Returns all the models computed during the model selection.
 
-#### 1.1.7. set_model
+#### 1.1.7. set_model (type)
 Sets another of the computed models as best performing one if the user wants to do so (knn, boosting or svc)
 
-#### 1.1.8. save_model
+#### 1.1.8. save_model (path='sequential_sensory_data_model.bin')
 For further usage the user of this class can save the model and all its components (best performing model, other models, standard scaler, sequentializer)
 
-#### 1.1.9. load_model
+#### 1.1.9. load_model (path='sequential_sensory_data_model.bin')
 In order to load a precomputed model one can use this function by just giving the path of the model and all its components get loaded.
 
 ### 1.2. ScoreMap
@@ -44,13 +44,13 @@ In order to load a precomputed model one can use this function by just giving th
 > For having a mechanism to classify the actions of a user and them give a certain score the class called **ScoreMap** was introduced.   
 It needs a vector of categories and the ordinal scale depending on the cetagories as features as well as a scoring strategy (linear, quadratic, kubic, exponential) for initialization.
 
-#### 1.2.1. fit
+#### 1.2.1. fit (categories, scores)
 Fits categories to scores and enumerates them.
 
-#### 1.2.2. get_activitiy
+#### 1.2.2. get_activitiy (activity_number)
 Returns the description of an activity as string for a certain number.
 
-#### 1.2.3 get_score
+#### 1.2.3 get_score (activity_number)
 Depending on the scoring strategy this function returns the score for a certain number (defined by enumeration of the categories)
 
 ## 2. Usage
