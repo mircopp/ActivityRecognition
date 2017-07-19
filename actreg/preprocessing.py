@@ -46,7 +46,7 @@ class Sequentializer():
                 means = [np.mean(XY_curr_sequence, axis=0) for i in range(missing_rows)]
                 XY_curr_sequence = np.vstack((XY_curr_sequence, means))
             y_sequentialized = []
-            for x in XY_curr_sequence[:, :-1]:
+            for x in XY_curr_sequence:
                 y_sequentialized.extend(x)
             XY_sequentialized.append(y_sequentialized)
         return np.array(XY_sequentialized)

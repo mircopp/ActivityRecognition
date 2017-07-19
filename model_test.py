@@ -3,7 +3,7 @@ import pandas as ps
 from actreg.seqmod import SequentialSensoryDataModel
 
 if __name__ == '__main__':
-    model_paths = ['sequential_sensory_data_model_fifth_iteration.bin']
+    model_paths = ['sequential_sensory_data_model_classical.bin']
     for path in model_paths:
         model = SequentialSensoryDataModel(path=path)
         models = model.get_models()

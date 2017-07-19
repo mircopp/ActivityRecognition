@@ -37,7 +37,7 @@ class SequentialSensoryDataModel(BaseEstimator, ClassifierMixin):
         :return: None
         """
 
-        X_train, X_val, y_train, y_val = train_test_split(X, y, train_size=0.75, stratify=y)
+        X_train, X_val, y_train, y_val = train_test_split(X, y, train_size=0.66, stratify=y)
 
         # Normalization
         self.standard_scaler = StandardScaler()
