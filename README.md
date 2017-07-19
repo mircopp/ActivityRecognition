@@ -19,7 +19,7 @@ At the beginning the model splits the input matrix and output vector in training
 Returns the prediction of the best performing model.
 
 #### 1.1.3. score (X, y)
-Returns the score of the best performing model
+Returns the score of the best performing model.
 
 #### 1.1.4. normalize (X)
 For normalization it uses the **StandardScaler** of sklearn package. For applying nomralization with the model scaler the class provides a function to normalize the data before processing.    
@@ -33,10 +33,10 @@ Returns the sequentialized matrix x and vector y (if passed).
 Returns all the models computed during the model selection.
 
 #### 1.1.7. set_model (type)
-Sets another of the computed models as best performing one if the user wants to do so (knn, boosting or svc)
+Sets another of the computed models as best performing one if the user wants to do so (knn, boosting or svc).
 
 #### 1.1.8. save_model (path='sequential_sensory_data_model.bin')
-For further usage the user of this class can save the model and all its components (best performing model, other models, standard scaler, sequentializer)
+For further usage the user of this class can save the model and all its components (best performing model, other models, standard scaler, sequentializer).
 
 #### 1.1.9. load_model (path='sequential_sensory_data_model.bin')
 In order to load a precomputed model one can use this function by just giving the path of the model and all its components get loaded.
@@ -53,24 +53,24 @@ Fits categories to scores and enumerates them.
 Returns the description of an activity as string for a certain number.
 
 #### 1.2.3 get_score (activity_number)
-Depending on the scoring strategy this function returns the score for a certain number (defined by enumeration of the categories)
+Depending on the scoring strategy this function returns the score for a certain number (defined by enumeration of the categories).
 
 ## 2. Usage
 
 > In this sector one can find some example of how to use the model and score map.
 
 ### 2.1. Model training
-At first import all needed dependencies:
-```python
+
+For the model fitting simply follow this example:
+````python
 import pandas as ps
 import numpy as np
 from sklearn.model_selection import train_test_split
 
-# The new custom package
+# The new custom model package
 from actreg.seqmod import SequentialSensoryDataModel
-```
-For the model fitting simply follow this example:
-````python
+
+
 model = SequentialSensoryDataModel()
 
 input_files = ['data_collection/labelled/mHealth_subject' + str(int(i)) + '.csv' for i in np.linspace(1, 10, 10)]
@@ -94,13 +94,18 @@ print('\nTest score:', model.score(X_test, y_test))
 
 # Safe the model and all his components
 print('Save best model...\n')
-model.save_model(path=save_path)
+model.save_model()
 ````
 
 ### 2.2. Model prediction
 
 For making predictions with an precomputed model follow this example:
 ````python
+import pandas as ps
+
+from actreg.seqmod import SequentialSensoryDataModel
+
+
 # Setup the model
 model = SequentialSensoryDataModel(path='sequential_sensory_data_model.bin')
     
@@ -120,6 +125,12 @@ prediction = model.predict(X)
 ### 2.3. Score the predictions
 For calculating wether the current user is acting quite active or not follow this example:
 ````python
+import numpy as np
+
+# The new custom metric package
+from actreg.metrics import ScoreMap
+
+
 # Setup the score map
 DICTIONARY = ["None", "Standing", "Sitting", "Lying", "Walking", "Climbing stairs", "Waist bending", "Arm elevation", "Knees bending", "Cycling", "Jogging", "Running", "Jumping"]
 SCOREMAP = [0, 2, 1, 0, 3, 5, 4, 4, 4, 6, 4, 7, 5]
